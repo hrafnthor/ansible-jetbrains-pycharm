@@ -1,0 +1,76 @@
+- name: "HTH | PyCharm | Set desktop entry name"
+  ansible.builtin.set_fact:
+    hth_pycharm_client_desktop_entry_name: "pycharm-{{ client.version }}.desktop"
+
+- name: "HTH | PyCharm | Set desktop entry path"
+  ansible.builtin.set_fact:
+    hth_pycharm_client_desktop_entry_path: "{{ hth_pycharm_default_desktop_entry_path }}/{{ hth_pycharm_client_desktop_entry_name }}"
+
+- name: "HTH | PyCharm | Create desktop entry"
+  ansible.builtin.copy:
+    src: entry.desktop
+    dest: "{{ hth_pycharm_client_desktop_entry_path }}"
+    owner: "{{ client.location.owner | default('root') }}"
+    group: "{{ client.location.group | default('root') }}"
+    force: no
+    mode: 0664
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Set desktop entry name"
+  ansible.builtin.lineinfile:
+    path: "{{ hth_pycharm_client_desktop_entry_path }}"
+    regexp: "^Name="
+    line: "Name={{ client.desktop.name | default('pycharm-' + client.version) }}"
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Set desktop entry icon"
+  ansible.builtin.lineinfile:
+    path: "{{ hth_pycharm_client_desktop_entry_path }}"
+    regexp: "^Icon="
+    line: "Icon={{ hth_pycharm_client_installation_path }}/bin/pycharm.svg"
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Set desktop entry binary"
+  ansible.builtin.lineinfile:
+    path: "{{ hth_pycharm_client_desktop_entry_path }}"
+    regexp: "^Exec="
+    line: "Exec=\"{{ hth_pycharm_client_installation_path }}/bin/pycharm\""
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Set desktop entry keywords"
+  ansible.builtin.lineinfile:
+    path: "{{ hth_pycharm_client_desktop_entry_path }}"
+    regexp: "^Keywords="
+    line: "Keywords={{ client.desktop.keywords | join(';') }}"
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.desktop.keywords is defined
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Validate desktop entry"
+  ansible.builtin.shell:
+    cmd: "desktop-file-validate /usr/share/applications/{{ hth_pycharm_client_desktop_entry_name }}"
+  when:
+    - client.desktop is defined
+    - client.desktop.remove is not defined or not client.desktop.remove
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Remove desktop entry"
+  ansible.builtin.file:
+    path: "{{ hth_pycharm_client_desktop_entry_path }}"
+    state: absent
+  when:
+    - (client.remove is defined and client.remove) or (client.desktop is defined and client.desktop.remove is defined and client.desktop.remove)

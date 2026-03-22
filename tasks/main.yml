@@ -1,36 +1,15 @@
-- name: "Pycharm | Validate input variables"
+- name: "HTH | PyCharm | Validate input variables"
   ansible.utils.validate:
     data: "{{ pycharm }}"
     criteria: "{{ lookup('file',  'assertions/criteria/pycharm-criteria.json') | from_json }}"
     engine: ansible.utils.jsonschema
   run_once: yes
   delegate_to: localhost
+  when:
+    - pycharm is defined
 
-
-- name: "Pycharm | Set installation path"
-  ansible.builtin.set_fact:
-    pycharm_path: "{{ pycharm.location.path | default(pycharm_default_path) }}"
-
-
-- name: "Pycharm | Manage installation path"
-  ansible.builtin.file:
-    path: "{{ pycharm_path }}"
-    state: "{{ 'directory' if (pycharm.remove is undefined or not pycharm.remove) else 'absent' }}"
-    owner: "{{ pycharm.location.owner | default('root') }}"
-    group: "{{ pycharm.location.group | default('root') }}"
-    mode: "{{ pycharm.location.mode | default('0755') }}"
-    modification_time: preserve
-    access_time: preserve
-    recurse: true
-
-
-- name: "Pycharm | Manage clients"
-  ansible.builtin.include_tasks: manage.yml
+- name: "HTH | PyCharm | Manage clients"
+  ansible.builtin.include_tasks: clients/main.yml
   loop: "{{ pycharm.clients }}"
   loop_control:
-    loop_var: "client"
-  when:
-    - pycharm.remove is undefined or not pycharm.remove
-
-- name: "Pycharm | Manage cli"
-  ansible.builtin.include_tasks: cli.yml
+    loop_var: client

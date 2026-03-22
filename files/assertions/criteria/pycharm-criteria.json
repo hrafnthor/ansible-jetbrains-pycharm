@@ -4,10 +4,6 @@
     "type": "object",
     "properties":
     {
-        "remove":
-        {
-            "type": "boolean"
-        },
         "location":
         {
             "type": "object",
@@ -41,131 +37,69 @@
                 {
                     "version":
                     {
-                        "ref": "#/definitions/semvar-string"
+                        "description": "The version to install.",
+                        "ref": "#/definitions/non-empty-string"
                     },
                     "checksum":
                     {
+                        "description": "The checksum of the archived version being installed.",
                         "ref": "#/definitions/non-empty-string"
-                    },
-                    "edition":
-                    {
-                        "type": "string",
-                        "enum":
-                        [
-                            "community",
-                            "professional"
-                        ]
                     },
                     "remove":
                     {
+                        "description": "Indicates if this version should be removed or not",
                         "type": "boolean"
                     },
                     "desktop":
                     {
+                        "description": "Describes the desktop entry that should be created for the version.",
                         "type": "object",
                         "properties":
                         {
+                            "name":
+                            {
+                                "description": "The name that the desktop entry should have, and shows up when searching for desktop applications.",
+                                "$ref": "#/definitions/non-empty-string"
+                            },
+                            "keywords":
+                            {
+                                "description": "A list of keywords to add to the desktop entry for easier search",
+                                "$ref": "#/definitions/non-empty-string-array"
+                            },
                             "remove":
                             {
+                                "description": "Indicates if the desktop entry should be removed for this version.",
                                 "type": "boolean"
-                            },
-                            "launcher":
-                            {
-                                "type": "string",
-                                "enum":
-                                [
-                                    "native",
-                                    "script"
-                                ]
                             }
-                        },
-                        "anyOf":
-                        [
-                            {
-                                "required":
-                                [
-                                    "remove"
-                                ]
-                            },
-                            {
-                                "required":
-                                [
-                                    "launcher"
-                                ]
-                            }
-                        ]
+                        }
                     }
                 },
-                "anyOf":
-                [
+                "if":
+                {
+                    "properties":
                     {
-                        "required":
-                        [
-                            "version",
-                            "edition",
-                            "checksum"
-                        ]
-                    },
-                    {
-                        "required":
-                        [
-                            "version",
-                            "edition",
-                            "remove"
-                        ]
+                        "remove":
+                        {
+                            "const": false
+                        }
                     }
-                ]
-            }
-        },
-        "cli":
-        {
-            "type": "object",
-            "properties":
-            {
-                "remove":
-                {
-                    "type": "boolean"
                 },
-                "version":
-                {
-                    "ref": "#/definitions/semvar-string"
-                },
-                "edition":
-                {
-                    "type": "string",
-                    "enum":
-                    [
-                        "community",
-                        "professional"
-                    ]
-                },
-                "launcher":
-                {
-                    "type": "string",
-                    "enum":
-                    [
-                        "native",
-                        "script"
-                    ]
-                }
-            },
-            "anyOf":
-            [
-                {
-                    "required":
-                    [
-                        "remove"
-                    ]
-                },
+                "then":
                 {
                     "required":
                     [
                         "version",
-                        "edition",
-                        "launcher"
+                        "checksum"
+                    ]
+                },
+                "else":
+                {
+                    "required":
+                    [
+                        "version"
                     ]
                 }
-            ]
+            }
         }
     },
     "definitions":
@@ -175,10 +109,14 @@
             "type": "string",
             "minLength": 1
         },
-        "semvar-string":
+        "non-empty-string-array":
         {
-            "type": "string",
-            "pattern": "^[\\d]+(.[\\d])*$"
+            "type": "array",
+            "minItems": 1,
+            "items":
+            {
+                "$ref": "#/definitions/non-empty-string"
+            }
         }
     }
 }

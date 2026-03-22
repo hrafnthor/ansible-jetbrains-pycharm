@@ -1,3 +1,18 @@
 
-# The default installation path for Pycharm versions
-pycharm_default_path: "/opt/jetbrains/pycharm"
+# The default installation path for PyCharm versions
+hth_pycharm_default_path: /opt/jetbrains/pycharm/
+
+# The default temporary download path for client artifacts
+hth_pycharm_default_download_path: /tmp/
+
+# The default path for desktop entry files
+hth_pycharm_default_desktop_entry_path: /usr/share/applications
+
+# The host used when downloading archives
+hth_pycharm_default_host: https://download.jetbrains.com/
+
+# The path appended to the host when downloading archives
+hth_pycharm_default_url_path: python/
+
+# Indicates if downloaded artifacts should be cleaned up after a successful install.
+hth_pycharm_default_cleanup_on_install: true
