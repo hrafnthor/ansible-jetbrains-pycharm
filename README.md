@@ -50,27 +50,23 @@ All variables are optional unless otherwise stated.
 
 ```yaml
 pycharm:
-  remove: [boolean] If present, will remove all installation and configuration made by the role
   location:
-    path: [string]  The installation location where community and professional versions will be installed. Defaults to '/opt/jetbrains/pycharm'
-    owner: [string] The owner of the installation location. Defaults to 'root'.
-    group: [string] The group owning the installation location. Defaults to 'root'
-    mode: [string]  The mode for the installation location. Defaults to '0755'
+    path:         [string]  The installation location where community and professional versions will be installed. Defaults to '/opt/jetbrains/pycharm'
+    owner:        [string] The owner of the installation location. Defaults to 'root'.
+    group:        [string] The group owning the installation location. Defaults to 'root'
+    mode:         [string]  The mode for the installation location. Defaults to '0755'
   clients:
-    - version: [string] The version to install. Find it at https://www.jetbrains.com/pycharm/download/other.html [required if installing]
-      checksum: [string] The checksum of the version archive. See below. [required if installing]
-      edition: [community, professional] Indicates the type of client this is. [required if installing].
-      remove: [boolean] Indicates if this edition should be removed.
-      desktop: 
-        remove: [boolean] Indicates if a desktop entry should be removed.
-        launcher: [script, native] Indicates if the launcher should use the bash script or native binary in the launcher. [required if not removing]
-  cli:
-    version: [String] The version to set as primary cli version. [required if not removing].
-    edition: [community, professional] Indicates the edition that should be linked. [required if not removing]
-    remove: [boolean] Indicates if the cli link should be removed
+    - version:    [string] The version to install. Find it at https://www.jetbrains.com/pycharm/download/other.html [required if installing]
+      checksum:   [string] The checksum of the version archive. See below. [required if installing]
+      remove:     [boolean] Indicates if this edition should be removed.
+      desktop:
+        name:     [string] The display name to for the launcher.
+        remove:   [boolean] Indicates if a desktop entry should be removed.
+        keywords: [array] Array of string keywords to add to the desktop launcher, to help with search.
 ```
 
-Checksums for versions can be found by locating the appropriate tar archive [here](https://www.jetbrains.com/pycharm/download/other.html) and navigating to the url linked with `.sha256` appended (for example https://download.jetbrains.com/python/pycharm-professional-2024.3.1.1.tar.gz.sha256).
+Checksums for versions can be found by locating the appropriate tar archive [here](https://www.jetbrains.com/pycharm/download/other.html) and navigating to the url linked with `.sha256` appended (for example https://download.jetbrains.com/python/pycharm-2025.3.3.tar.gz.sha256).
+
 
 #### Example Playbook
 
@@ -80,15 +76,22 @@ Checksums for versions can be found by locating the appropriate tar archive [her
       vars:
         pycharm:
           location:
+            owner: root
             group: "developers"
-            mode: "2774"
+            mode: "0775"
           clients:
-            professional:
-              version: "2024.3.1.1"
-              checksum: "5698131d93d00a261c720a31ec54ef1c850581c274be6938dd923e8c0383da25"
-              desktop: true
-          cli:
-            edition: professional
+            - version: "2025.3.3"
+              checksum: "347752040eb83eb79f5eb0458a556d2cb306ac0e1d973c3e73743f9cdb8a4a0a"
+              remove: false
+              desktop:
+                remove: false
+                keywords:
+                  - python
+                  - jetbrains
+                  - ide
+                  - dev
+                  - development
+                  - django
       roles:
          - hth-jetbrains-pycharm
 ```

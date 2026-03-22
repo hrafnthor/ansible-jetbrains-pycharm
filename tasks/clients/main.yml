@@ -1,0 +1,33 @@
+- name: "HTH | PyCharm | Set client installation path"
+  ansible.builtin.set_fact:
+    hth_pycharm_client_installation_path: "{{ location.path | default(hth_pycharm_default_path) }}{{ client.version }}"
+
+- name: "HTH | PyCharm | Stat client install directory"
+  ansible.builtin.stat:
+    path:  "{{ hth_pycharm_client_installation_path }}"
+  register: hth_pycharm_client_version_dir_state
+
+- name: "HTH | PyCharm | Stat client install directory contents"
+  ansible.builtin.find:
+    paths: "{{ hth_pycharm_client_installation_path }}"
+    file_type: any
+  register: hth_pycharm_client_version_dir_content_state
+  when:
+    - hth_pycharm_client_version_dir_state.stat.exists
+
+- name: "HTH | PyCharm | Install client version"
+  ansible.builtin.include_tasks: install.yml
+  when:
+    - not hth_pycharm_client_version_dir_state.stat.exists or (hth_pycharm_client_version_dir_content_state.files | length == 0)
+    - client.remove is not defined or not client.remove
+
+- name: "HTH | PyCharm | Manage desktop entry"
+  ansible.builtin.include_tasks: desktop.yml
+
+- name: "HTH | PyCharm | Remove client"
+  ansible.builtin.file:
+    path: "{{ hth_pycharm_client_installation_path }}"
+    state: absent
+  when:
+    - client.remove is defined
+    - client.remove
